@@ -42,7 +42,7 @@ function M.get_binary()
     local stdout = cmd.exec("ls " .. bin_dir)
     for f in stdout:gmatch("[^\r\n]+") do
       if f:match("^sous%-chef%-v") and f ~= bin_name then
-        file.remove(file.join_path(bin_dir, f))
+        cmd.exec("rm " .. file.join_path(bin_dir, f))
       end
     end
   end)
