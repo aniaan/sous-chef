@@ -326,6 +326,23 @@ var Registry = map[string]*PluginConfig{
 		FormatVersion:  RemoveVPrefixFormatVersion,
 		RecoverVersion: AddVPrefixRecoverVersion,
 	},
+	"ty": {
+		Name:                    "ty",
+		Cmd:                     "ty",
+		Repo:                    "astral-sh/ty",
+		AssetTemplate:           "ty-{{.Arch}}-{{.Platform}}.tar.gz",
+		RelativeBinPathTemplate: "ty",
+		StripComponents:         1,
+		PlatformMap: map[util.Platform]string{
+			util.Darwin: "apple-darwin",
+			util.Linux:  "unknown-linux-gnu",
+		},
+		ReleaseFilter: func(r gh.Release) bool {
+			return !r.Prerelease
+		},
+		FormatVersion:  NoOpVersion,
+		RecoverVersion: NoOpVersion,
+	},
 	"codex": {
 		Name:                    "codex",
 		Cmd:                     "codex",
