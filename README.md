@@ -43,6 +43,18 @@ Once installed, you can use it to manage tools defined in its registry:
 mise use -g sous-chef:neovim@latest
 ```
 
+Or via config (only needed if you want to pin the plugin URL in config):
+
+```toml
+[plugins]
+"vfox-backend:sous-chef" = "https://github.com/aniaan/sous-chef"
+
+[tools]
+"sous-chef:neovim" = "latest"
+```
+
+Note: the `vfox-backend:` prefix is required only in `[plugins]` config. If the plugin is configured there without the prefix, `mise` may treat it as an asdf plugin and collapse `sous-chef:<tool>` into a single backend, which can break `@latest` resolution across multiple tools. If you previously configured it without the prefix, remove any old installs and reinstall (or delete `~/.local/share/mise/installs/sous-chef-*/.mise.backend`).
+
 ### GitHub API Rate Limiting
 
 `sous-chef` uses the GitHub API to fetch release information. GitHub limits unauthenticated requests to 60 per hour, which can be easily exceeded when listing versions for multiple tools.
