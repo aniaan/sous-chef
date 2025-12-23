@@ -38,16 +38,30 @@ func NewClient() *Client {
 	}
 }
 
-// GetReleaseByTag fetches a specific release by tag
-func (c *Client) GetReleaseByTag(repo, tag string) (*Release, error) {
-	url := fmt.Sprintf("%s/repos/%s/releases/tags/%s", githubAPIBaseURL, repo, tag)
-	req, err := http.NewRequest("GET", url, nil)
+func (c *Client) newRequest(method, url string) (*http.Request, error) {
+	req, err := http.NewRequest(method, url, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	req.Header.Set("User-Agent", "sous-chef")
-	req.Header.Set("Accept", "application/vnd.github.v3+json")
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+
+	token := os.Getenv("GITHUB_TOKEN")
+	if token != "" {
+		req.Header.Set("Authorization", "token "+token)
+	}
+
+	return req, nil
+}
+
+// GetReleaseByTag fetches a specific release by tag
+func (c *Client) GetReleaseByTag(repo, tag string) (*Release, error) {
+	url := fmt.Sprintf("%s/repos/%s/releases/tags/%s", githubAPIBaseURL, repo, tag)
+
+	req, err := c.newRequest("GET", url)
+	if err != nil {
+		return nil, err
+	}
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
@@ -89,13 +103,11 @@ func (c *Client) GetAssetChecksum(repo, tag, filename string) (string, error) {
 // ListReleases fetches the latest releases for a repository
 func (c *Client) ListReleases(repo string) ([]Release, error) {
 	url := fmt.Sprintf("%s/repos/%s/releases", githubAPIBaseURL, repo)
-	req, err := http.NewRequest("GET", url, nil)
+
+	req, err := c.newRequest("GET", url)
 	if err != nil {
 		return nil, err
 	}
-
-	req.Header.Set("User-Agent", "sous-chef")
-	req.Header.Set("Accept", "application/vnd.github.v3+json")
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
@@ -119,12 +131,10 @@ func (c *Client) ListReleases(repo string) ([]Release, error) {
 func (c *Client) DownloadReleaseAsset(repo, tag, filename, destPath string) error {
 	url := fmt.Sprintf("https://github.com/%s/releases/download/%s/%s", repo, tag, filename)
 
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := c.newRequest("GET", url)
 	if err != nil {
 		return err
 	}
-
-	req.Header.Set("User-Agent", "sous-chef")
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
@@ -145,3 +155,4 @@ func (c *Client) DownloadReleaseAsset(repo, tag, filename, destPath string) erro
 	_, err = io.Copy(out, resp.Body)
 	return err
 }
+

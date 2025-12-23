@@ -43,6 +43,16 @@ Once installed, you can use it to manage tools defined in its registry:
 mise use -g sous-chef:neovim@latest
 ```
 
+### GitHub API Rate Limiting
+
+`sous-chef` uses the GitHub API to fetch release information. GitHub limits unauthenticated requests to 60 per hour, which can be easily exceeded when listing versions for multiple tools.
+
+To avoid this, set the `GITHUB_TOKEN` environment variable with a valid GitHub Personal Access Token. This increases the rate limit to 5000 requests per hour.
+
+```bash
+export GITHUB_TOKEN="your_token_here"
+```
+
 ### CLI Commands (Go Binary)
 
 The Go binary can be used standalone for debugging or development:
