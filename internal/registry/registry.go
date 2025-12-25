@@ -369,14 +369,6 @@ var Registry = map[string]*PluginConfig{
 	},
 }
 
-func DefaultFormatVersion(v string) string {
-	return v
-}
-
-func DefaultRecoverVersion(v string) string {
-	return v
-}
-
 func NoOpVersion(v string) string {
 	return v
 }
