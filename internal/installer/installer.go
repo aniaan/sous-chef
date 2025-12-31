@@ -95,8 +95,12 @@ func Install(plugin *registry.PluginConfig, version, installDir string) error {
 
 	// Extract
 	fmt.Printf("Extracting to %s...\n", installDir)
-	if strings.HasSuffix(filename, ".tar.gz") || strings.HasSuffix(filename, ".tgz") {
+	if strings.HasSuffix(filename, ".tar.gz") {
 		if err := util.ExtractTarGz(downloadPath, installDir, plugin.StripComponents); err != nil {
+			return err
+		}
+	} else if strings.HasSuffix(filename, ".tar.xz") {
+		if err := util.ExtractTarXz(downloadPath, installDir, plugin.StripComponents); err != nil {
 			return err
 		}
 	} else if strings.HasSuffix(filename, ".gz") {

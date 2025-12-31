@@ -367,6 +367,24 @@ var Registry = map[string]*PluginConfig{
 			return strings.TrimPrefix(v, "rust-v")
 		},
 	},
+	"zls": {
+		Name:                    "zls",
+		Cmd:                     "zls",
+		Repo:                    "zigtools/zls",
+		AssetTemplate:           "zls-{{.Arch}}-{{.Platform}}.tar.xz",
+		RelativeBinPathTemplate: "zls",
+		StripComponents:         0,
+		ArchMap: map[util.Arch]string{
+			util.X86_64:  "x86_64",
+			util.Aarch64: "aarch64",
+		},
+		PlatformMap: map[util.Platform]string{
+			util.Darwin: "macos",
+			util.Linux:  "linux",
+		},
+		FormatVersion:  NoOpVersion,
+		RecoverVersion: NoOpVersion,
+	},
 }
 
 func NoOpVersion(v string) string {

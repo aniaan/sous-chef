@@ -10,6 +10,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/ulikunitz/xz"
 )
 
 var errIllegalPath = errors.New("illegal file path in archive")
@@ -55,7 +57,28 @@ func ExtractTarGz(src, dest string, stripComponents int) error {
 	}
 	defer gzr.Close()
 
-	tr := tar.NewReader(gzr)
+	return extractTar(gzr, dest, stripComponents)
+}
+
+// ExtractTarXz extracts a .tar.xz archive to dest, stripping stripComponents directories.
+// Only regular files and directories are extracted; symlinks are skipped.
+func ExtractTarXz(src, dest string, stripComponents int) error {
+	f, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	xzr, err := xz.NewReader(f)
+	if err != nil {
+		return err
+	}
+
+	return extractTar(xzr, dest, stripComponents)
+}
+
+func extractTar(r io.Reader, dest string, stripComponents int) error {
+	tr := tar.NewReader(r)
 
 	for {
 		header, err := tr.Next()
