@@ -44,11 +44,12 @@ func (c *Client) newRequest(method, url string) (*http.Request, error) {
 		return nil, err
 	}
 
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+	req.Header.Set("User-Agent", "sous-chef")
+	req.Header.Set("Accept", "application/vnd.github+json")
 
 	token := os.Getenv("GITHUB_TOKEN")
 	if token != "" {
-		req.Header.Set("Authorization", "token "+token)
+		req.Header.Set("Authorization", "Bearer "+token)
 	}
 
 	return req, nil
@@ -155,4 +156,3 @@ func (c *Client) DownloadReleaseAsset(repo, tag, filename, destPath string) erro
 	_, err = io.Copy(out, resp.Body)
 	return err
 }
-
