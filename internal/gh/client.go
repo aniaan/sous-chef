@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -23,18 +24,27 @@ type Asset struct {
 	Digest             string `json:"digest"` // Custom field, optional
 }
 
-const githubAPIBaseURL = "https://api.github.com"
+const defaultGitHubAPIBaseURL = "https://api.github.com"
 
 // Client is a simple GitHub API client
 type Client struct {
 	httpClient *http.Client
+	baseURL    string
 }
 
 func NewClient() *Client {
+	baseURL := os.Getenv("SOUS_CHEF_GITHUB_API_URL")
+	if baseURL == "" {
+		baseURL = defaultGitHubAPIBaseURL
+	}
+	// Remove trailing slash
+	baseURL = strings.TrimRight(baseURL, "/")
+
 	return &Client{
 		httpClient: &http.Client{
 			Timeout: 60 * time.Second,
 		},
+		baseURL: baseURL,
 	}
 }
 
@@ -57,7 +67,7 @@ func (c *Client) newRequest(method, url string) (*http.Request, error) {
 
 // GetReleaseByTag fetches a specific release by tag
 func (c *Client) GetReleaseByTag(repo, tag string) (*Release, error) {
-	url := fmt.Sprintf("%s/repos/%s/releases/tags/%s", githubAPIBaseURL, repo, tag)
+	url := fmt.Sprintf("%s/repos/%s/releases/tags/%s", defaultGitHubAPIBaseURL, repo, tag)
 
 	req, err := c.newRequest("GET", url)
 	if err != nil {
@@ -103,7 +113,7 @@ func (c *Client) GetAssetChecksum(repo, tag, filename string) (string, error) {
 
 // ListReleases fetches the latest releases for a repository
 func (c *Client) ListReleases(repo string) ([]Release, error) {
-	url := fmt.Sprintf("%s/repos/%s/releases", githubAPIBaseURL, repo)
+	url := fmt.Sprintf("%s/repos/%s/releases", c.baseURL, repo)
 
 	req, err := c.newRequest("GET", url)
 	if err != nil {

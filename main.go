@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"os"
@@ -65,6 +66,9 @@ func main() {
 	case "list-latest-versions":
 		runListLatestVersions()
 
+	case "list-repos":
+		runListRepos()
+
 	default:
 		printUsage()
 		os.Exit(1)
@@ -79,6 +83,7 @@ func printUsage() {
 	fmt.Println("  list-latest-versions")
 	fmt.Println("  install --tool <name> --version <ver> --dir <path>")
 	fmt.Println("  install-latest --tool <name> --dir <path>")
+	fmt.Println("  list-repos")
 }
 
 func runInstallLatest(toolName, dir string) {
@@ -168,6 +173,22 @@ func runListLatestVersions() {
 
 		fmt.Printf("%s: %s #%s\n", name, v, latest.PublishedAt.Format("2006-01-02T15:04:05Z"))
 	}
+}
+
+func runListRepos() {
+	repos := make([]string, 0, len(registry.Registry))
+	seen := make(map[string]bool)
+	for _, plugin := range registry.Registry {
+		if !seen[plugin.Repo] {
+			repos = append(repos, plugin.Repo)
+			seen[plugin.Repo] = true
+		}
+	}
+	sort.Strings(repos)
+
+	enc := json.NewEncoder(os.Stdout)
+	enc.SetIndent("", "  ")
+	enc.Encode(repos)
 }
 
 func runInstall(toolName, version, dir string) {
