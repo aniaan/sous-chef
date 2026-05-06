@@ -221,6 +221,27 @@ var Registry = map[string]*PluginConfig{
 		FormatVersion:  RemoveVPrefixFormatVersion,
 		RecoverVersion: AddVPrefixRecoverVersion,
 	},
+	"golangci-lint": {
+		Name:                    "golangci-lint",
+		Cmd:                     "golangci-lint",
+		Repo:                    "golangci/golangci-lint",
+		AssetTemplate:           "golangci-lint-{{.Version}}-{{.Platform}}-{{.Arch}}.tar.gz",
+		RelativeBinPathTemplate: "golangci-lint",
+		StripComponents:         1,
+		PlatformMap: map[util.Platform]string{
+			util.Darwin: "darwin",
+			util.Linux:  "linux",
+		},
+		ArchMap: map[util.Arch]string{
+			util.X86_64:  "amd64",
+			util.Aarch64: "arm64",
+		},
+		ReleaseFilter: func(r gh.Release) bool {
+			return !r.Prerelease
+		},
+		FormatVersion:  RemoveVPrefixFormatVersion,
+		RecoverVersion: AddVPrefixRecoverVersion,
+	},
 	"taplo": {
 		Name:                    "taplo",
 		Cmd:                     "taplo",

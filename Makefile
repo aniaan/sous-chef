@@ -1,5 +1,5 @@
 BINARY_NAME=sous-chef
-VERSION=0.0.7
+VERSION=0.0.8
 LDFLAGS=-ldflags "-X main.Version=$(VERSION)"
 
 .PHONY: build clean release
