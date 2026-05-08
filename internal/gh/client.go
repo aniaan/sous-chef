@@ -24,7 +24,10 @@ type Asset struct {
 	Digest             string `json:"digest"` // Custom field, optional
 }
 
-const defaultGitHubAPIBaseURL = "https://api.github.com"
+const (
+	defaultGitHubAPIBaseURL = "https://api.github.com"
+	defaultHTTPTimeout      = 10 * time.Minute
+)
 
 // Client is a simple GitHub API client
 type Client struct {
@@ -40,9 +43,16 @@ func NewClient() *Client {
 	// Remove trailing slash
 	baseURL = strings.TrimRight(baseURL, "/")
 
+	timeout := defaultHTTPTimeout
+	if v := os.Getenv("SOUS_CHEF_HTTP_TIMEOUT"); v != "" {
+		if d, err := time.ParseDuration(v); err == nil {
+			timeout = d
+		}
+	}
+
 	return &Client{
 		httpClient: &http.Client{
-			Timeout: 60 * time.Second,
+			Timeout: timeout,
 		},
 		baseURL: baseURL,
 	}
