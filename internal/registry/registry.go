@@ -147,6 +147,27 @@ var Registry = map[string]*PluginConfig{
 		FormatVersion:  RemoveVPrefixFormatVersion,
 		RecoverVersion: AddVPrefixRecoverVersion,
 	},
+	"tmux": {
+		Name:                    "tmux",
+		Cmd:                     "tmux",
+		Repo:                    "tmux/tmux-builds",
+		AssetTemplate:           "tmux-{{.Version}}-{{.Platform}}-{{.Arch}}.tar.gz",
+		RelativeBinPathTemplate: "tmux",
+		StripComponents:         0,
+		PlatformMap: map[util.Platform]string{
+			util.Darwin: "macos",
+			util.Linux:  "linux",
+		},
+		ArchMap: map[util.Arch]string{
+			util.X86_64:  "x86_64",
+			util.Aarch64: "arm64",
+		},
+		ReleaseFilter: func(r gh.Release) bool {
+			return !r.Prerelease
+		},
+		FormatVersion:  RemoveVPrefixFormatVersion,
+		RecoverVersion: AddVPrefixRecoverVersion,
+	},
 	"fd": {
 		Name:                    "fd",
 		Cmd:                     "fd",
