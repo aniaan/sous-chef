@@ -100,6 +100,10 @@ var Registry = map[string]*PluginConfig{
 		AssetTemplate:           "rust-analyzer-{{.Arch}}-{{.Platform}}.gz",
 		RelativeBinPathTemplate: "rust-analyzer",
 		StripComponents:         0,
+		ReleaseFilter: func(r gh.Release) bool {
+			// Skip the rolling "nightly" prerelease tag
+			return !r.Prerelease
+		},
 		PlatformMap: map[util.Platform]string{
 			util.Darwin: "apple-darwin",
 			util.Linux:  "unknown-linux-gnu",
@@ -108,7 +112,18 @@ var Registry = map[string]*PluginConfig{
 			return strings.ReplaceAll(v, "-", ".")
 		},
 		RecoverVersion: func(v string) string {
-			return strings.ReplaceAll(v, ".", "-")
+			// Tags are date based (2026-08-17) and may carry a patch suffix
+			// (2026-08-17.4). Only the date separators become dashes; the
+			// suffix keeps its dot.
+			parts := strings.SplitN(v, ".", 4)
+			if len(parts) < 3 {
+				return v
+			}
+			tag := parts[0] + "-" + parts[1] + "-" + parts[2]
+			if len(parts) == 4 {
+				tag += "." + parts[3]
+			}
+			return tag
 		},
 	},
 	"lazygit": {
